@@ -2,6 +2,7 @@ import logging
 import logging.handlers
 import random
 import sys
+import requests
 from typing import Dict, List, Union
 
 from ratelimitingfilter import RateLimitingFilter
@@ -23,6 +24,23 @@ from synch.writer.versioned_collapsing_merge_tree import ClickHouseVersionedColl
 _readers: Dict[str, Reader] = {}
 _writers: Dict[str, List[ClickHouse]] = {}
 _brokers: Dict[str, Broker] = {}
+
+
+class WechatHookHandler(logging.Handler):
+    """
+        用于企业微信机器人
+        for WeChat Work robot
+    """
+
+    def __init__(self, url):
+        logging.Handler.__init__(self)
+        self.url = url
+
+    def emit(self, record):
+        try:
+            requests.post(url=self.url, json={"msgtype": "text", "text": {"content": str(record)}})
+        except Exception:
+            self.handleError(record)
 
 
 def get_reader(alias: str) -> Reader:
@@ -125,6 +143,16 @@ def init_logging():
         sh.setFormatter(fmt)
         sh.addFilter(rate_limit)
         base_logger.addHandler(sh)
+    wechat = Settings.get("wechat")
+    if wechat:
+        rate_limit = RateLimitingFilter(per=60)
+        wh = WechatHookHandler(
+            url=wechat.get('url')
+        )
+        wh.setLevel(logging.ERROR)
+        wh.setFormatter(fmt)
+        wh.addFilter(rate_limit)
+        base_logger.addHandler(wh)
 
 
 def init_monitor_db(cluster_name: str = None):
