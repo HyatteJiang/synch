@@ -45,6 +45,7 @@ class SqlConvert:
         "bigchar": "String",
         "text": "String",
         "longtext": "String",
+        "mediumtext": "String"
     }
 
     @classmethod
