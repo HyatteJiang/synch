@@ -44,10 +44,11 @@ class ClickHouseMergeTree(ClickHouse):
         pk,
         partition_by: str = None,
         engine_settings: str = None,
+        order_by: str = None,
         **kwargs,
     ):
         super(ClickHouseMergeTree, self).get_table_create_sql(
-            reader, schema, table, pk, partition_by, engine_settings, **kwargs
+            reader, schema, table, pk, partition_by, engine_settings, order_by, **kwargs
         )
         partition_by_str = ""
         engine_settings_str = ""
@@ -56,7 +57,7 @@ class ClickHouseMergeTree(ClickHouse):
         if engine_settings:
             engine_settings_str = f" SETTINGS {engine_settings} "
         select_sql = reader.get_source_select_sql(schema, table)
-        return f"CREATE TABLE {schema}.{table}{cluster_sql(self.cluster_name)} ENGINE = {self.engine} {partition_by_str} ORDER BY {pk} {engine_settings_str} AS {select_sql} limit 0"
+        return f"CREATE TABLE {schema}.{table}{cluster_sql(self.cluster_name)} ENGINE = {self.engine} {partition_by_str} ORDER BY {order_by} {engine_settings_str} AS {select_sql} limit 0"
 
     def get_full_insert_sql(self, reader: Reader, schema: str, table: str, sign_column: str = None):
         return f"insert into {schema}.{table} {reader.get_source_select_sql(schema, table, )}"

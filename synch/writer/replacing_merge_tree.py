@@ -15,6 +15,7 @@ class ClickHouseReplacingMergeTree(ClickHouseMergeTree):
         pk,
         partition_by: str = None,
         engine_settings: str = None,
+        order_by: str = None,
         version_column: str = None,
         **kwargs,
     ):
@@ -25,6 +26,7 @@ class ClickHouseReplacingMergeTree(ClickHouseMergeTree):
             pk,
             partition_by,
             engine_settings,
+            order_by,
             version_column=version_column,
             **kwargs,
         )
@@ -36,6 +38,6 @@ class ClickHouseReplacingMergeTree(ClickHouseMergeTree):
         if engine_settings:
             engine_settings_str = f" SETTINGS {engine_settings} "
         if version_column:
-            return f"CREATE TABLE {schema}.{table}{cluster_sql(self.cluster_name)} ENGINE = {self.engine}({version_column}) {partition_by_str} ORDER BY {pk} {engine_settings_str} AS {select_sql} limit 0"
+            return f"CREATE TABLE {schema}.{table}{cluster_sql(self.cluster_name)} ENGINE = {self.engine}({version_column}) {partition_by_str} ORDER BY {order_by} {engine_settings_str} AS {select_sql} limit 0"
         else:
-            return f"CREATE TABLE {schema}.{table}{cluster_sql(self.cluster_name)} ENGINE = {self.engine} {partition_by_str} ORDER BY {pk} {engine_settings_str} AS {select_sql} limit 0"
+            return f"CREATE TABLE {schema}.{table}{cluster_sql(self.cluster_name)} ENGINE = {self.engine} {partition_by_str} ORDER BY {order_by} {engine_settings_str} AS {select_sql} limit 0"

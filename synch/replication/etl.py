@@ -43,6 +43,7 @@ def etl_full(
         if not writer.check_table_exists(schema, table_name):
             sign_column = table.get("sign_column")
             version_column = table.get("version_column")
+            order_by = table.get("order_by")
             writer.execute(
                 writer.get_table_create_sql(
                     reader,
@@ -53,13 +54,14 @@ def etl_full(
                     table.get("engine_settings"),
                     sign_column=sign_column,
                     version_column=version_column,
+                    order_by=order_by,
                 )
             )
             if Settings.is_cluster():
                 for w in get_writer(choice=False):
                     w.execute(
                         w.get_distributed_table_create_sql(
-                            schema, table_name, Settings.get("clickhouse", "distributed_suffix")
+                            schema, table_name, Settings.get("clickhouse.distributed_suffix")
                         )
                     )
             if reader.fix_column_type and not table.get("skip_decimal"):
