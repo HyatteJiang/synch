@@ -19,7 +19,6 @@ logger = logging.getLogger("synch.reader.mysql")
 
 
 class Mysql(Reader):
-    only_events = (DeleteRowsEvent, WriteRowsEvent, UpdateRowsEvent, QueryEvent)
     fix_column_type = True
 
     def __init__(self, alias):
@@ -44,6 +43,8 @@ class Mysql(Reader):
         self.cursor = self.conn.cursor()
         self.databases = list(map(lambda x: x.get("database"), source_db.get("databases")))
         self.pos_handler = RedisLogPos(alias)
+        self.only_events = (WriteRowsEvent, UpdateRowsEvent, QueryEvent) if source_db.get('filter_delete') else (
+            DeleteRowsEvent, WriteRowsEvent, UpdateRowsEvent, QueryEvent)
 
     def get_source_select_sql(self, schema: str, table: str, sign_column: str = None):
         select = "*"
@@ -110,14 +111,14 @@ class Mysql(Reader):
         only_tables = list(set(tables))
         logger.info(f"only_schemas:{only_schemas},only_tables:{only_tables}")
         for schema, table, event, file, pos in self._binlog_reading(
-            only_tables=only_tables,
-            only_schemas=only_schemas,
-            log_file=log_file,
-            log_pos=log_pos,
-            server_id=self.server_id,
-            skip_dmls=self.skip_dmls,
-            skip_delete_tables=self.skip_delete_tables,
-            skip_update_tables=self.skip_update_tables,
+                only_tables=only_tables,
+                only_schemas=only_schemas,
+                log_file=log_file,
+                log_pos=log_pos,
+                server_id=self.server_id,
+                skip_dmls=self.skip_dmls,
+                skip_delete_tables=self.skip_delete_tables,
+                skip_update_tables=self.skip_update_tables,
         ):
             if table and table not in schema_tables.get(schema):
                 continue
@@ -131,15 +132,15 @@ class Mysql(Reader):
             self.after_send(schema, table)
 
     def _binlog_reading(
-        self,
-        only_tables,
-        only_schemas,
-        log_file,
-        log_pos,
-        server_id,
-        skip_dmls,
-        skip_delete_tables,
-        skip_update_tables,
+            self,
+            only_tables,
+            only_schemas,
+            log_file,
+            log_pos,
+            server_id,
+            skip_dmls,
+            skip_delete_tables,
+            skip_update_tables,
     ) -> Generator:
         stream = BinLogStreamReader(
             connection_settings=dict(
