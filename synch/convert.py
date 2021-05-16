@@ -104,7 +104,7 @@ class SqlConvert:
         :param cluster_name
         :return:
         """
-        query = query.replace(f"{schema}.", "")
+        query = query.replace(f"{schema}.", "").replace(f"`{schema}`.", "")
         try:
             ret = cls.get_parse_ret(query)
         except Exception as e:
