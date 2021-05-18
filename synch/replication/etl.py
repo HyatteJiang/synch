@@ -8,7 +8,7 @@ logger = logging.getLogger("synch.replication.etl")
 
 
 def etl_full(
-    alias: str, schema: str, tables_pk: Dict, renew=False,
+        alias: str, schema: str, tables_pk: Dict, renew=False, full=True
 ):
     """
     full etl
@@ -26,6 +26,9 @@ def etl_full(
             )
             exit(-1)
     for table in source_db_database.get("tables"):
+        if not full:
+            if table['table'] not in list(tables_pk.keys()):
+                continue
         if table.get("auto_full_etl") is False:
             continue
         table_name = table.get("table")

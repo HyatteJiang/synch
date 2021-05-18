@@ -54,7 +54,7 @@ def etl(ctx: Context, schema: str, renew: bool, table: List[str]):
     reader = get_reader(alias)
     for table in tables:
         tables_pk[table] = reader.get_primary_key(schema, table)
-    etl_full(alias, schema, tables_pk, renew)
+    etl_full(alias, schema, tables_pk, renew, full=False)
 
 
 @cli.command(help="Consume from broker and insert into ClickHouse.")
