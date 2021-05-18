@@ -26,7 +26,7 @@ python-dateutil = "*"
 pyyaml = "*"
 redis = "*"
 sentry-sdk = "*"
-mysqlparse = "*"
+# mysqlparse = "*"
 ratelimitingfilter = "*"
 
 [tool.poetry.dev-dependencies]

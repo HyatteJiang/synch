@@ -1,4 +1,7 @@
 FROM python:3
+RUN git clone https://hub.fastgit.org/HyatteJiang/mysqlparse.git
+WORKDIR /mysqlparse
+RUN python setup.py install
 RUN mkdir -p /synch
 WORKDIR /synch
 COPY pyproject.toml poetry.lock /synch/

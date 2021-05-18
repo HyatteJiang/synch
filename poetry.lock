@@ -241,17 +241,6 @@ optional = false
 python-versions = ">=3.5"
 version = "2.0.1"
 
-[[package]]
-category = "main"
-description = "A library for parsing SQL statements."
-name = "mysqlparse"
-optional = false
-python-versions = "*"
-version = "0.1.6"
-
-[package.dependencies]
-pyparsing = "*"
-six = "*"
 
 [[package]]
 category = "dev"
