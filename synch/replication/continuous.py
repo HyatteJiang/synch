@@ -40,7 +40,7 @@ def finish_continuous_etl(broker):
 
 
 def continuous_etl(
-    alias: str, schema: str, tables_pk: Dict, tables_dict: Dict, last_msg_id, skip_error: bool,
+        alias: str, schema: str, tables_pk: Dict, tables_dict: Dict, last_msg_id, skip_error: bool,
 ):
     """
     continuous etl from broker and insert into clickhouse
@@ -59,7 +59,7 @@ def continuous_etl(
     signal.signal(signal.SIGTERM, signal_handler)
 
     for msg_id, msg in broker.msgs(
-        schema, last_msg_id=last_msg_id, count=Settings.insert_num(), block=insert_interval * 1000
+            schema, last_msg_id=last_msg_id, count=Settings.insert_num(), block=insert_interval * 1000
     ):
         if not msg_id and not msg:
             logger.info(
@@ -95,8 +95,8 @@ def continuous_etl(
                 )
 
             if (
-                len_event == insert_num
-                or time.time() - last_insert_time >= Settings.insert_interval()
+                    len_event == insert_num
+                    or time.time() - last_insert_time >= Settings.insert_interval()
             ):
                 is_insert = True
 
@@ -158,7 +158,7 @@ def continuous_etl(
                 try:
                     get_writer().execute(query)
                 except Exception as e:
-                    logger.error(f"alter table error: {e}", exc_info=True, stack_info=True)
+                    logger.error(f"alter table error: {e},msg:{msg},msg_id:{msg_id}", exc_info=True, stack_info=True)
                     if not skip_error:
                         exit(-1)
             broker.commit(schema)
