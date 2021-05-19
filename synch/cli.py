@@ -104,11 +104,13 @@ def check(ctx: Context, schema: str):
     for table in tables:
         source_table_count = reader.get_count(schema, table)
         target_table_count = writer.get_count(schema, table)
+        diff = source_table_count - target_table_count
+        diff_ratio = diff / source_table_count * 100
         if source_table_count == target_table_count:
             logger.info(f"{schema}.{table} is equal, count={source_table_count}")
         else:
             logger.warning(
-                f"{schema}.{table} is not equal, source_table_count={source_table_count}, target_table_count={target_table_count}"
+                f"{schema}.{table} is not equal, source_table_count={source_table_count}, target_table_count={target_table_count}, diff={diff}, diff_ratio={diff_ratio}%"
             )
 
 
