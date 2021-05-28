@@ -109,7 +109,7 @@ def check(ctx: Context, schema: str, with_orderby: bool):
     t.add_column("mysql_count", justify="right")
     t.add_column("clickhouse_count", justify="right")
     t.add_column("difference", justify="right")
-    t.add_column("ratio", justify="right")
+    t.add_column("ratio (%)", justify="right")
 
     for table in tables:
         order_by_col = [i.strip() for i in
@@ -121,7 +121,8 @@ def check(ctx: Context, schema: str, with_orderby: bool):
         diff_ratio = diff / source_table_count * 100
         if source_table_count == target_table_count:
             logger.info(f"{schema}.{table} is equal, count={source_table_count}")
-            t.add_row(table, str(source_table_count), str(target_table_count), str(diff), str(diff_ratio), style="green")
+            t.add_row(table, str(source_table_count), str(target_table_count), str(diff), str(diff_ratio),
+                      style="green")
         else:
             t.add_row(table, str(source_table_count), str(target_table_count), str(diff), str(diff_ratio), style="red")
             logger.warning(
