@@ -41,6 +41,11 @@ class Reader:
         sql = f"select count(*) as c from {schema}.{table}"
         return self.execute(sql)[0].get("c")
 
+    def get_count_with_order_by_column(self, schema: str, table: str, cols: list):
+        sql = f"select count(distinct {','.join(cols)}) as c from {schema}.{table}" if len(
+            cols) > 0 else f"select count(*) as c from {schema}.{table}"
+        return self.execute(sql)[0].get("c")
+
     @abc.abstractmethod
     def get_primary_key(self, db: str, table: str) -> Union[None, str, Tuple[str, ...]]:
         raise NotImplementedError
