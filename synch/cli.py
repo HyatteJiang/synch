@@ -95,23 +95,40 @@ def produce(ctx: Context):
 
 @cli.command(help="Check whether equal count of target database records and ClickHouse.")
 @click.option("--schema", help="Schema to check.", required=True)
+@click.option("--with-orderby", help="check mysql distinct orderby columns.", is_flag=True, default=False)
 @click.pass_context
-def check(ctx: Context, schema: str):
+def check(ctx: Context, schema: str, with_orderby: bool):
     alias = ctx.obj["alias"]
     reader = get_reader(alias)
     writer = get_writer()
     tables = Settings.get_source_db_database_tables_name(alias, schema)
+    from rich.console import Console
+    from rich.table import Table
+    t = Table(title="check difference")
+    t.add_column("table_name", justify="right", no_wrap=True)
+    t.add_column("mysql_count", justify="right")
+    t.add_column("clickhouse_count", justify="right")
+    t.add_column("difference", justify="right")
+    t.add_column("ratio", justify="right")
+
     for table in tables:
-        source_table_count = reader.get_count(schema, table)
+        order_by_col = [i.strip() for i in
+                        Settings.get_source_db_database_tables_dict(alias, schema)[table]['order_by'][1:-1].split(
+                            ',')] if with_orderby else []
+        source_table_count = reader.get_count_with_order_by_column(schema, table, order_by_col)
         target_table_count = writer.get_count(schema, table)
         diff = source_table_count - target_table_count
         diff_ratio = diff / source_table_count * 100
         if source_table_count == target_table_count:
             logger.info(f"{schema}.{table} is equal, count={source_table_count}")
+            t.add_row(table, source_table_count, target_table_count, diff, diff_ratio, style="green")
         else:
+            t.add_row(table, source_table_count, target_table_count, diff, diff_ratio, style="red")
             logger.warning(
                 f"{schema}.{table} is not equal, source_table_count={source_table_count}, target_table_count={target_table_count}, diff={diff}, diff_ratio={diff_ratio}%"
             )
+    console = Console()
+    console.print(t)
 
 
 if __name__ == "__main__":

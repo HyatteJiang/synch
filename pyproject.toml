@@ -16,6 +16,7 @@ version = "0.7.1"
 
 [tool.poetry.dependencies]
 click = "*"
+rich = "*"
 clickhouse-driver = "*"
 kafka-python = "*"
 mysql-replication = "*"
