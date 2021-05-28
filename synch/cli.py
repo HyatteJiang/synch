@@ -121,9 +121,9 @@ def check(ctx: Context, schema: str, with_orderby: bool):
         diff_ratio = diff / source_table_count * 100
         if source_table_count == target_table_count:
             logger.info(f"{schema}.{table} is equal, count={source_table_count}")
-            t.add_row(table, source_table_count, target_table_count, diff, diff_ratio, style="green")
+            t.add_row(table, str(source_table_count), str(target_table_count), str(diff), str(diff_ratio), style="green")
         else:
-            t.add_row(table, source_table_count, target_table_count, diff, diff_ratio, style="red")
+            t.add_row(table, str(source_table_count), str(target_table_count), str(diff), str(diff_ratio), style="red")
             logger.warning(
                 f"{schema}.{table} is not equal, source_table_count={source_table_count}, target_table_count={target_table_count}, diff={diff}, diff_ratio={diff_ratio}%"
             )
