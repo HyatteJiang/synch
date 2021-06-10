@@ -163,9 +163,13 @@ class Mysql(Reader):
                 query = binlog_event.query.lower()
                 if "alter" not in query:
                     continue
-                table, convent_sql = SqlConvert.to_clickhouse(
-                    schema, query, Settings.cluster_name()
-                )
+                try:
+                    table, convent_sql = SqlConvert.to_clickhouse(
+                        schema, query, Settings.cluster_name()
+                    )
+                except Exception as e:
+                    logger.error(f"generate sql error, e: {e}, schema: {schema}, query:{query}")
+                    continue
                 if not convent_sql:
                     continue
                 event = {
